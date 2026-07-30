@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "WePump",
-    "slug": "WePump",
+    "slug": "wepump",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -37,6 +37,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8230afd5-0b49-44d4-ae5f-7b8c486244a5"
+      }
+    },
+    "owner": "wepump"
   }
 }
