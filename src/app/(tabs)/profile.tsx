@@ -3,6 +3,7 @@ import { useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   useColorScheme,
@@ -11,6 +12,7 @@ import {
 
 import { Colors, Spacing } from '@/constants/theme';
 import { useProfile } from '@/hooks/use-profile';
+import { usePersonalRecords } from '@/hooks/use-workouts';
 import { supabase } from '@/lib/supabase';
 
 function StatCard({ label, value }: { label: string; value: string | number }) {
@@ -29,6 +31,7 @@ export default function ProfileScreen() {
   const colors = Colors[colorScheme];
   const queryClient = useQueryClient();
   const { data: profile, isPending, error } = useProfile();
+  const { data: personalRecords } = usePersonalRecords();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   async function handleSignOut() {
@@ -55,7 +58,10 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView
+      style={{ backgroundColor: colors.background }}
+      contentContainerStyle={styles.container}
+    >
       <View style={styles.header}>
         <Text style={styles.avatar}>💪</Text>
         <Text style={[styles.username, { color: colors.text }]}>
@@ -72,6 +78,33 @@ export default function ProfileScreen() {
         <StatCard label="Best streak" value={profile.longest_streak} />
       </View>
 
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          🏆 Personal Records
+        </Text>
+        {!personalRecords || personalRecords.length === 0 ? (
+          <Text style={{ color: colors.textSecondary }}>
+            No PRs yet — go lift something heavy!
+          </Text>
+        ) : (
+          personalRecords.slice(0, 10).map((pr) => (
+            <View
+              key={pr.exercise_id}
+              style={[styles.prRow, { backgroundColor: colors.backgroundElement }]}
+            >
+              <Text style={[styles.prName, { color: colors.text }]}>
+                {pr.exercises.name}
+              </Text>
+              <Text style={[styles.prValue, { color: colors.textSecondary }]}>
+                {Number(pr.best_weight_kg) > 0
+                  ? `${Number(pr.best_weight_kg)} kg × ${pr.best_reps}`
+                  : `${pr.best_reps} reps`}
+              </Text>
+            </View>
+          ))
+        )}
+      </View>
+
       <Pressable
         style={[styles.signOutButton, isSigningOut && styles.buttonDisabled]}
         disabled={isSigningOut}
@@ -79,13 +112,12 @@ export default function ProfileScreen() {
       >
         <Text style={styles.signOutText}>Sign Out</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: Spacing.four,
     gap: Spacing.five,
   },
@@ -98,7 +130,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     gap: Spacing.one,
-    marginTop: Spacing.four,
+    marginTop: Spacing.two,
   },
   avatar: {
     fontSize: 64,
@@ -128,12 +160,34 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 12,
   },
+  section: {
+    gap: Spacing.two,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: Spacing.one,
+  },
+  prRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 12,
+    padding: Spacing.three,
+  },
+  prName: {
+    fontSize: 15,
+    fontWeight: '600',
+    flex: 1,
+  },
+  prValue: {
+    fontSize: 14,
+  },
   signOutButton: {
     borderRadius: 12,
     padding: Spacing.three,
     alignItems: 'center',
     backgroundColor: '#E5484D',
-    marginTop: 'auto',
   },
   buttonDisabled: {
     opacity: 0.5,
