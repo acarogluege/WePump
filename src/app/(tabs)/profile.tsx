@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -40,6 +41,29 @@ export default function ProfileScreen() {
     queryClient.clear();
   }
 
+  function handleDeleteAccount() {
+    Alert.alert(
+      'Delete account?',
+      'This permanently deletes your account, workouts, XP, and streaks. This cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete forever',
+          style: 'destructive',
+          onPress: async () => {
+            const { error: deleteError } = await supabase.rpc('delete_account');
+            if (deleteError) {
+              Alert.alert('Could not delete account', deleteError.message);
+              return;
+            }
+            await supabase.auth.signOut({ scope: 'local' });
+            queryClient.clear();
+          },
+        },
+      ]
+    );
+  }
+
   if (isPending) {
     return (
       <View style={[styles.center, { backgroundColor: colors.background }]}>
@@ -53,6 +77,12 @@ export default function ProfileScreen() {
       <View style={[styles.center, { backgroundColor: colors.background }]}>
         <Text style={{ color: colors.text }}>Could not load profile.</Text>
         <Text style={{ color: colors.textSecondary }}>{error?.message}</Text>
+        <Pressable
+          style={[styles.signOutButton, { alignSelf: 'stretch', margin: Spacing.four }]}
+          onPress={handleSignOut}
+        >
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </Pressable>
       </View>
     );
   }
@@ -68,7 +98,7 @@ export default function ProfileScreen() {
           @{profile.username}
         </Text>
         <Text style={[styles.level, { color: colors.textSecondary }]}>
-          Level {profile.level}
+          Level {profile.level} · {profile.total_xp} / {profile.level * profile.level * 100} XP
         </Text>
       </View>
 
@@ -111,6 +141,10 @@ export default function ProfileScreen() {
         onPress={handleSignOut}
       >
         <Text style={styles.signOutText}>Sign Out</Text>
+      </Pressable>
+
+      <Pressable style={styles.deleteAccountButton} onPress={handleDeleteAccount}>
+        <Text style={styles.deleteAccountText}>Delete Account</Text>
       </Pressable>
     </ScrollView>
   );
@@ -195,6 +229,15 @@ const styles = StyleSheet.create({
   signOutText: {
     color: '#ffffff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  deleteAccountButton: {
+    alignItems: 'center',
+    padding: Spacing.two,
+  },
+  deleteAccountText: {
+    color: '#E5484D',
+    fontSize: 14,
     fontWeight: '600',
   },
 });

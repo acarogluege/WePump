@@ -20,9 +20,13 @@ function RootNavigator() {
   return (
     <Stack>
       <Stack.Protected guard={!!session}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Home' }} />
         <Stack.Screen name="workout/new" options={{ title: 'Active Workout' }} />
         <Stack.Screen name="workout/[id]" options={{ title: 'Workout' }} />
+        <Stack.Screen
+          name="workout/summary"
+          options={{ title: 'Workout Complete', headerBackVisible: false, gestureEnabled: false }}
+        />
         <Stack.Screen
           name="exercise-picker"
           options={{ title: 'Add Exercise', presentation: 'modal' }}

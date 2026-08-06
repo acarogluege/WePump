@@ -61,6 +61,8 @@ personal_records (user_id, exercise_id, best_weight_kg, best_reps, achieved_at)
 xp_events      (id, user_id, amount, reason, created_at)          -- audit trail, source of truth for XP
 weekly_xp      (user_id, week_start, xp)                          -- materialized for fast leaderboards
 friendships    (user_id, friend_id, status: pending/accepted)
+clubs          (id, name, description, avatar_url, owner_id, is_private)
+club_members   (club_id, user_id, role: owner/admin/member, joined_at)
 badges         (id, code, name, description, icon)
 user_badges    (user_id, badge_id, earned_at)
 challenges     (id, week_start, code, title, target, xp_reward)
@@ -79,7 +81,8 @@ user_challenges (user_id, challenge_id, progress, completed_at)
 4. **Leaderboard** — tabs: Global | Friends, weekly countdown timer
 5. **Profile** — level ring, badges grid, PR list, history calendar (Duolingo-style)
 6. **Friends** — search, requests, friend list
-7. **Challenges** — weekly challenge cards with progress bars
+7. **Clubs** — club page, member list, member activity feed (Strava-style)
+8. **Challenges** — weekly challenge cards with progress bars
 
 ## 6. Development Phases
 
@@ -89,8 +92,8 @@ user_challenges (user_id, challenge_id, progress, completed_at)
 | **1. Auth & Profiles** | Sign up/in, username, profile screen skeleton |
 | **2. Workout Logging** | Exercise library, logger flow, history, PRs |
 | **3. XP Engine** | Server-side XP rules, levels, streaks, XP summary UI |
-| **4. Leaderboards** | weekly_xp pipeline, global + friends boards |
-| **5. Social** | Friend requests, public profiles |
+| **4. Social & Communities** | Friend requests, public profiles, clubs/teams with member activity visibility (Strava-style) — to be designed in depth when started |
+| **5. Leaderboards** | weekly_xp pipeline, global + friends + club boards |
 | **6. Badges & Challenges** | Badge engine, weekly challenges |
 | **7. Notifications & Polish** | Push reminders, animations, empty states |
 | **8. Beta Release** | TestFlight / Play internal testing |

@@ -104,10 +104,24 @@ export default function ActiveWorkoutScreen() {
     finishWorkout.mutate(
       { startedAt, exercises },
       {
-        onSuccess: ({ setCount }) => {
+        onSuccess: ({ award }) => {
           reset();
-          Alert.alert('Workout saved! 💪', `You logged ${setCount} sets. Keep it up!`);
-          router.back();
+          router.replace({
+            pathname: '/workout/summary',
+            params: {
+              xp: String(award.xp_awarded),
+              baseXp: String(award.base_xp),
+              setXp: String(award.set_xp),
+              prXp: String(award.pr_xp),
+              multiplier: String(award.multiplier),
+              streak: String(award.streak),
+              freezeUsed: String(award.freeze_used),
+              level: String(award.level),
+              leveledUp: String(award.leveled_up),
+              totalXp: String(award.total_xp),
+              nextLevelXp: String(award.next_level_xp),
+            },
+          });
         },
         onError: (error) => {
           Alert.alert('Could not save workout', error.message);
